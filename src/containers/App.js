@@ -1,45 +1,36 @@
-import React, {Component} from "react";
 import CardList from '../components/cardList'
 import SearchBox from "../components/SearchBox";
 import Scroll from '../components/Scroll'
 import './App.css';
+import { useEffect, useState } from 'react';
 
 
+const App = () => {
+    const [robots, setRobots] = useState([]);
+    const [searchfeild, setSearchfeild] = useState('');
 
-
-class App extends Component{
-    constructor(){
-        super()
-        this.state = {
-            robots: [],
-            searchfeild : ''
-        }
-    }
-
-    componentDidMount() {
+    useEffect(() =>{
         fetch('https://jsonplaceholder.typicode.com/users')
         .then(response => response.json())
-        .then(users => this.setState({robots: users}))
+        .then(users => {setRobots(users)})
+    }, [])
+    const onSearchChange = (e) => {
+        setSearchfeild(e.target.value)
+    }
+    const filterRobots = robots.filter(robot=> {
+        return robot.name.toLowerCase().includes(searchfeild.toLocaleLowerCase())})
 
-    }
+    return (
+        <div className = 'tc'>
+            <h1 className = 'f1'>RoboFriends</h1>
+            <SearchBox searchChange = {onSearchChange} />
+            <Scroll>
+                <CardList robots = {filterRobots}/>
+            </Scroll>
+        </div>
+    );
+}
 
-    onSearchChange = (e) => {
-        this.setState({searchfeild : e.target.value})
-    }
-    render(){
-        const filterRobots = this.state.robots.filter(robot=> {
-            return robot.name.toLowerCase().includes(this.state.searchfeild.toLocaleLowerCase())
-        })
-        return (
-            <div className = 'tc'>
-                <h1 className = 'f1'>RoboFriends</h1>
-                <SearchBox searchChange = {this.onSearchChange} />
-                <Scroll>
-                    <CardList robots = {filterRobots}/>
-                </Scroll>
-            </div>
-        );
-    }
-    }
+
 
 export default App;
